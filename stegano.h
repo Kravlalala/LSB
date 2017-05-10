@@ -11,6 +11,7 @@ class Stegano
 private:
   Mat original_container;
   Mat result_container;
+  Mat *planes;
   QString message;
 
 public:
@@ -19,6 +20,8 @@ public:
   ~Stegano ();
   void set_message(QString);
   bool set_data(const char*);
+  void show_image (const char *, Mat);
+  void split_container ();
 };
 
 #endif // STEGANO_H

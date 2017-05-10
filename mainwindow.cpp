@@ -6,6 +6,7 @@ MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
   container.set_data ("lenna.bmp");
+  container.split_container();
   ui->setupUi (this);
 }
 
