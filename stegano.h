@@ -13,7 +13,7 @@ private:
   Mat original_container;
   Mat result_container;
   Mat *planes;
-  QStringList message;
+  QByteArray message;
   //QString message;
 
 public:

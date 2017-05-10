@@ -51,15 +51,10 @@ void Stegano::split_container ()
 void Stegano::read_message_from_file (const char *file_name)
 {
   QFile input_file (file_name);
-  QString current_line;
   bool ret;
   ret = input_file.open (QIODevice::ReadOnly);
   if (ret != false) {
-    QTextStream input_stream (&input_file);
-    while (!input_stream.atEnd ()) {
-      current_line = input_stream.readLine ();
-      message += current_line;
-    }
+    message=input_file.readAll();
     input_file.close ();
   } else
     qDebug () << "error of opening text file\n";
