@@ -4,7 +4,7 @@
 using namespace cv;
 Stegano::Stegano ()
 {
-     planes = new Mat[3];
+  planes = new Mat[3];
 }
 Stegano::Stegano (const char *image_path)
 {
@@ -16,13 +16,13 @@ Stegano::Stegano (const char *image_path)
 
 Stegano::~Stegano ()
 {
-    delete [] planes;
+  delete[] planes;
 }
 
-void Stegano::set_message (QString new_message)
+/*void Stegano::set_message (QString new_message)
 {
-  message = new_message;
-}
+ message = new_message;
+}*/
 
 bool Stegano::set_data (const char *image_path)
 {
@@ -32,7 +32,7 @@ bool Stegano::set_data (const char *image_path)
     return false;
   } else {
     result_container = original_container.clone ();
-    show_image("container",result_container);
+    show_image ("container", result_container);
     return true;
   }
 }
@@ -43,10 +43,24 @@ void Stegano::show_image (const char *win_name, Mat image)
   imshow (win_name, image);
 }
 
-void Stegano::split_container(){
-    split(original_container,planes);
-    show_image("blue", planes[0]);
-    show_image("green",planes[1]);
-    show_image("red",planes[2]);
+void Stegano::split_container ()
+{
+  split (original_container, planes);
 }
 
+void Stegano::read_message_from_file (const char *file_name)
+{
+  QFile input_file (file_name);
+  QString current_line;
+  bool ret;
+  ret = input_file.open (QIODevice::ReadOnly);
+  if (ret != false) {
+    QTextStream input_stream (&input_file);
+    while (!input_stream.atEnd ()) {
+      current_line = input_stream.readLine ();
+      message += current_line;
+    }
+    input_file.close ();
+  } else
+    qDebug () << "error of opening text file\n";
+}

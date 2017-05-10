@@ -7,6 +7,9 @@ MainWindow::MainWindow (QWidget *parent)
 {
   container.set_data ("lenna.bmp");
   container.split_container();
+
+  /* Read message from text file */
+  container.read_message_from_file("message.txt");
   ui->setupUi (this);
 }
 
@@ -18,5 +21,5 @@ MainWindow::~MainWindow ()
 void MainWindow::on_messageArea_textChanged ()
 {
   QString edit_data = ui->messageArea->toPlainText ();
-  container.set_message (edit_data);
+ // container.set_message (edit_data);
 }
