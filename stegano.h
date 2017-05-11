@@ -5,6 +5,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <QString>
 #include <QFile>
+#include <QVector>
 
 using namespace cv;
 class Stegano
@@ -16,6 +17,8 @@ private:
   QByteArray message;
   QByteArray start_stamp;
   QByteArray end_stamp;
+  QVector<char> container_data;
+
   //QString message;
 
 public:
@@ -28,6 +31,7 @@ public:
   void split_container ();
   void merge_planes ();
   bool read_message_from_file (const char *);
+  void expand_to_vector ();
 };
 
 #endif // STEGANO_H
