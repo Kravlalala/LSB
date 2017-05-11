@@ -2,10 +2,12 @@
 #include <QDebug>
 
 using namespace cv;
+/* Empty constructor  */
 Stegano::Stegano ()
 {
   planes = new Mat[3];
 }
+/* Constructot with container setting  */
 Stegano::Stegano (const char *image_path)
 {
   /* Load image */
@@ -14,6 +16,7 @@ Stegano::Stegano (const char *image_path)
   planes = new Mat[3];
 }
 
+/* Destructor  */
 Stegano::~Stegano ()
 {
   delete[] planes;
@@ -24,6 +27,10 @@ Stegano::~Stegano ()
  message = new_message;
 }*/
 
+/*
+ * Set container data.
+ * @image_path - path to the image.
+*/
 bool Stegano::set_data (const char *image_path)
 {
   original_container = imread (image_path);
@@ -37,17 +44,33 @@ bool Stegano::set_data (const char *image_path)
   }
 }
 
+/*
+ * Show image in a separate window.
+ * @win_name - window title.
+ * @image - showing image.
+*/
 void Stegano::show_image (const char *win_name, Mat image)
 {
   namedWindow (win_name, WINDOW_AUTOSIZE);
   imshow (win_name, image);
 }
 
+/* Split container in separate planes  */
 void Stegano::split_container ()
 {
   split (original_container, planes);
 }
 
+/* Merge color planes in one image  */
+void Stegano::merge_planes(){
+    merge(planes, 3,result_container);
+    show_image("merged",result_container);
+}
+
+/*
+ * Read message from input file in ASII.
+ * @file_name - path to the input file.
+*/
 void Stegano::read_message_from_file (const char *file_name)
 {
   QFile input_file (file_name);

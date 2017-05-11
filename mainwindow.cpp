@@ -7,6 +7,7 @@ MainWindow::MainWindow (QWidget *parent)
 {
   container.set_data ("lenna.bmp");
   container.split_container();
+  container.merge_planes();
 
   /* Read message from text file */
   container.read_message_from_file("message.txt");
