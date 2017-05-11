@@ -14,6 +14,8 @@ private:
   Mat result_container;
   Mat *planes;
   QByteArray message;
+  QByteArray start_stamp;
+  QByteArray end_stamp;
   //QString message;
 
 public:
@@ -25,7 +27,7 @@ public:
   void show_image (const char *, Mat);
   void split_container ();
   void merge_planes ();
-  void read_message_from_file (const char *);
+  bool read_message_from_file (const char *);
 };
 
 #endif // STEGANO_H
