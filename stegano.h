@@ -11,7 +11,6 @@
 #include <bitset>
 #include <iostream>
 
-#define LSB_MASK    254
 using namespace cv;
 using namespace std;
 class Stegano
@@ -21,6 +20,7 @@ private:
   Mat result_container;
   Mat *planes;
   QByteArray message;
+  QByteArray extracted_message;
   QByteArray start_stamp;
   QByteArray end_stamp;
   QVector<char> container_data;
@@ -42,6 +42,7 @@ public:
   bool ins_message ();
   void hide_message ();
   void extract_message ();
+  QByteArray get_lsb_data ();
   void print_bit_view (const char *, char);
 };
 

@@ -13,7 +13,8 @@ MainWindow::MainWindow (QWidget *parent)
   /* Insert message in the container */
   container.hide_message();
 
-  /**/
+  /* Extract message from the container */
+  container.extract_message();
   ui->setupUi (this);
 }
 

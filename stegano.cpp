@@ -77,6 +77,9 @@ void Stegano::split_container (Mat input_image)
 void Stegano::merge_planes (Mat result_image)
 {
   merge (planes, 3, result_image);
+  planes[0].release ();
+  planes[1].release ();
+  planes[2].release ();
 }
 
 /*
@@ -138,14 +141,15 @@ void Stegano::vector_to_planes (Mat *output_planes)
   /* Copy vector data in B, G and R color planes respectively */
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
-     output_planes[0].at<char> (y, x) = container_data[counter];
-     output_planes[1].at<char> (y, x) = container_data[counter + num_elements];
-     output_planes[2].at<char> (y, x) = container_data[counter + num_elements * 2];
+      output_planes[0].at<char> (y, x) = container_data[counter];
+      output_planes[1].at<char> (y, x) = container_data[counter + num_elements];
+      output_planes[2].at<char> (y, x) =
+          container_data[counter + num_elements * 2];
       ++counter;
     }
   }
   /* Frees vector */
-  container_data.remove(0,container_data.size());
+  container_data.remove (0, container_data.size ());
 }
 
 /* Insert message in the container  */
@@ -165,10 +169,18 @@ bool Stegano::ins_message ()
   /* Insert message bytes in the least significant bits of container data */
   for (int i = 0; i < msg_length; i++) {
     msg_byte = message.at (i);
+    //print_bit_view ("msg:", msg_byte);
     for (int j = 7; j >= 0; j--) {
-      current_bit = msg_byte | LSB_MASK;
-      container_data[j + 8 * i] = container_data[j + 8 * i] & current_bit;
+      current_bit = msg_byte & 1;
+     // print_bit_view ("cur:", current_bit);
+     // print_bit_view("dat:",container_data[j + 8 * i]);
+      if (current_bit == 1)
+        container_data[j + 8 * i] |= 1;
+      else
+        container_data[j + 8 * i] &= (~1);
+     // print_bit_view ("new:", container_data[j + 8 * i]);
       msg_byte >>= 1;
+     // print_bit_view("msg:",msg_byte);
     }
   }
 
@@ -180,7 +192,7 @@ void Stegano::hide_message ()
 {
   /* Insert message in the data vector */
   ins_message ();
-  /* Split vector to the color planes */
+  /* Split vector on the color planes */
   vector_to_planes (planes);
   /* Merge planes in result image */
   merge_planes (result_container);
@@ -188,9 +200,40 @@ void Stegano::hide_message ()
   show_image ("Result image", result_container);
 }
 
-/* Extract image from container and save it in the file  */
-void Stegano::extract_message(){
-
+/* Extract message from container and save it in the file  */
+void Stegano::extract_message ()
+{
+  /* Split container on the color planes */
+  split_container (result_container);
+  /* Expand plains to the vector */
+  planes_to_vector (planes);
+  /* Extract mesage */
+  extracted_message = get_lsb_data ();
+}
+QByteArray Stegano::get_lsb_data ()
+{
+  char current_lsb;
+  char msg_byte;
+  int container_size = container_data.size ();
+  QByteArray buf;
+  /* Get message bytes from least significant bits of the container data */
+  for (int i = 0; i < container_size / 8; i++) {
+    msg_byte = 0;
+    for (int j = 0; j < 8; j++) {
+      msg_byte <<= 1;
+     // print_bit_view ("msg:", msg_byte);
+      //print_bit_view ("data:", container_data[j + 8 * i]);
+      current_lsb = container_data[j + 8 * i] & 1;
+     // print_bit_view ("lsb:", current_lsb);
+      if (current_lsb == 1)
+        msg_byte |= 1;
+      else
+        msg_byte &= ~(1);
+     // print_bit_view ("new:", msg_byte);
+    }
+    buf.append (msg_byte);
+  }
+  return buf;
 }
 
 void Stegano::print_bit_view (const char *prepending_text, char symbol)
