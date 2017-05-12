@@ -34,15 +34,26 @@ Stegano::~Stegano ()
 */
 bool Stegano::set_data (const char *image_path)
 {
+  Size container_dimensions;
   original_container = imread (image_path, IMREAD_COLOR);
   if (!original_container.data) {
     qDebug () << "unknow path or file";
     return false;
   } else {
-    result_container = original_container.clone ();
-    //show_image ("container", result_container);
-    return true;
+    container_dimensions = original_container.size ();
+    result_container.create (container_dimensions.height,
+                             container_dimensions.width, CV_8UC3);
   }
+
+  /* Separate image on three color planes: B, G and R respectively */
+  this->split_container ();
+
+  /* Expand color data to vector */
+  this->planes_to_vector ();
+
+  show_image ("Original image", original_container);
+
+  return true;
 }
 
 /*
@@ -113,10 +124,6 @@ void Stegano::planes_to_vector ()
       ++counter;
     }
   }
-  show_image("B", planes[0]);
-  show_image("G", planes[1]);
-  show_image("R", planes[2]);
-  qDebug () << "list was filled\n";
 }
 
 /* Separate vector color data in a separate planes  */
@@ -137,8 +144,51 @@ void Stegano::vector_to_planes ()
       ++counter;
     }
   }
-  show_image("reestablished B",planes[0]);
-  show_image("reestablished G",planes[1]);
-  show_image("reestablished R",planes[2]);
+}
 
+/* Insert message in the container  */
+bool Stegano::ins_message ()
+{
+  char current_bit;
+  char msg_byte;
+  int msg_length = message.length ();
+  int container_size = container_data.size ();
+
+  /* Check that message does not goes beyond the container bounds */
+  if (container_size < msg_length) {
+    qDebug () << "Too large message\n";
+    return false;
+  }
+
+  /* Insert message bytes in the least significant bits of container data */
+  for (int i = 0; i < msg_length; i++) {
+    msg_byte = message.at (i);
+    for (int j = 7; j >= 0; j--) {
+      current_bit = msg_byte | LSB_MASK;
+      container_data[j + 8 * i] = container_data[j + 8 * i] & current_bit;
+      msg_byte >>= 1;
+      print_bit_view("msg:",msg_byte);
+    }
+  }
+
+  return true;
+}
+
+/* Insert message in the container and show result  */
+void Stegano::hide_message ()
+{
+  /* Insert message in the data vector */
+  this->ins_message ();
+  /* Split vector to the color planes */
+  this->vector_to_planes ();
+  /* Merge planes in result image */
+  this->merge_planes ();
+  /* Show output image */
+  show_image ("Result image", result_container);
+}
+
+void Stegano::print_bit_view (const char *prepending_text, char symbol)
+{
+  bitset<8> bview (symbol);
+  cout << prepending_text << bview << endl;
 }

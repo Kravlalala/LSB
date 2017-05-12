@@ -6,13 +6,14 @@ MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
   container.set_data ("lenna.bmp");
-  container.split_container();
-  container.merge_planes();
-  container.planes_to_vector();
-  container.vector_to_planes();
 
   /* Read message from text file */
   container.read_message_from_file("message.txt");
+
+  /* Insert message in the container */
+  container.hide_message();
+
+  /**/
   ui->setupUi (this);
 }
 

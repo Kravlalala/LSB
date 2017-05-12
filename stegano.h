@@ -8,8 +8,12 @@
 #include <QString>
 #include <QFile>
 #include <QVector>
+#include <bitset>
+#include <iostream>
 
+#define LSB_MASK    254
 using namespace cv;
+using namespace std;
 class Stegano
 {
 private:
@@ -35,6 +39,9 @@ public:
   bool read_message_from_file (const char *);
   void planes_to_vector ();
   void vector_to_planes ();
+  bool ins_message ();
+  void hide_message ();
+  void print_bit_view (const char *, char);
 };
 
 #endif // STEGANO_H
