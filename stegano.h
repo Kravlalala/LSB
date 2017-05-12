@@ -34,13 +34,14 @@ public:
   //void set_message(QString);
   bool set_data(const char *);
   void show_image (const char *, Mat);
-  void split_container ();
-  void merge_planes ();
+  void split_container (Mat);
+  void merge_planes (Mat);
   bool read_message_from_file (const char *);
-  void planes_to_vector ();
-  void vector_to_planes ();
+  void planes_to_vector (Mat *);
+  void vector_to_planes (Mat *);
   bool ins_message ();
   void hide_message ();
+  void extract_message ();
   void print_bit_view (const char *, char);
 };
 

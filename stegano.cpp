@@ -46,10 +46,10 @@ bool Stegano::set_data (const char *image_path)
   }
 
   /* Separate image on three color planes: B, G and R respectively */
-  this->split_container ();
+  split_container (original_container);
 
   /* Expand color data to vector */
-  this->planes_to_vector ();
+  planes_to_vector (planes);
 
   show_image ("Original image", original_container);
 
@@ -68,15 +68,15 @@ void Stegano::show_image (const char *win_name, Mat image)
 }
 
 /* Split container in separate planes  */
-void Stegano::split_container ()
+void Stegano::split_container (Mat input_image)
 {
-  split (original_container, planes);
+  split (input_image, planes);
 }
 
 /* Merge color planes in one image  */
-void Stegano::merge_planes ()
+void Stegano::merge_planes (Mat result_image)
 {
-  merge (planes, 3, result_container);
+  merge (planes, 3, result_image);
 }
 
 /*
@@ -104,9 +104,9 @@ bool Stegano::read_message_from_file (const char *file_name)
 }
 
 /* Create vector, containing data from all color planes  */
-void Stegano::planes_to_vector ()
+void Stegano::planes_to_vector (Mat *input_planes)
 {
-  Size plane_size = planes[0].size ();
+  Size plane_size = input_planes[0].size ();
   int width = plane_size.width;
   int height = plane_size.height;
   int counter = 0;
@@ -116,20 +116,20 @@ void Stegano::planes_to_vector ()
   container_data.resize (num_elements * 3);
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
-      container_data[counter] = planes[0].at<char> (Point (x, y));
+      container_data[counter] = input_planes[0].at<char> (Point (x, y));
       container_data[counter + num_elements] =
-          planes[1].at<char> (Point (x, y));
+          input_planes[1].at<char> (Point (x, y));
       container_data[counter + num_elements * 2] =
-          planes[2].at<char> (Point (x, y));
+          input_planes[2].at<char> (Point (x, y));
       ++counter;
     }
   }
 }
 
 /* Separate vector color data in a separate planes  */
-void Stegano::vector_to_planes ()
+void Stegano::vector_to_planes (Mat *output_planes)
 {
-  Size plane_size = planes[0].size ();
+  Size plane_size = output_planes[0].size ();
   int width = plane_size.width;
   int height = plane_size.height;
   int counter = 0;
@@ -138,12 +138,14 @@ void Stegano::vector_to_planes ()
   /* Copy vector data in B, G and R color planes respectively */
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
-      planes[0].at<char> (y, x) = container_data[counter];
-      planes[1].at<char> (y, x) = container_data[counter + num_elements];
-      planes[2].at<char> (y, x) = container_data[counter + num_elements * 2];
+     output_planes[0].at<char> (y, x) = container_data[counter];
+     output_planes[1].at<char> (y, x) = container_data[counter + num_elements];
+     output_planes[2].at<char> (y, x) = container_data[counter + num_elements * 2];
       ++counter;
     }
   }
+  /* Frees vector */
+  container_data.remove(0,container_data.size());
 }
 
 /* Insert message in the container  */
@@ -167,7 +169,6 @@ bool Stegano::ins_message ()
       current_bit = msg_byte | LSB_MASK;
       container_data[j + 8 * i] = container_data[j + 8 * i] & current_bit;
       msg_byte >>= 1;
-      print_bit_view("msg:",msg_byte);
     }
   }
 
@@ -178,13 +179,18 @@ bool Stegano::ins_message ()
 void Stegano::hide_message ()
 {
   /* Insert message in the data vector */
-  this->ins_message ();
+  ins_message ();
   /* Split vector to the color planes */
-  this->vector_to_planes ();
+  vector_to_planes (planes);
   /* Merge planes in result image */
-  this->merge_planes ();
+  merge_planes (result_container);
   /* Show output image */
   show_image ("Result image", result_container);
+}
+
+/* Extract image from container and save it in the file  */
+void Stegano::extract_message(){
+
 }
 
 void Stegano::print_bit_view (const char *prepending_text, char symbol)
