@@ -3,6 +3,8 @@
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
+
+#include <QDebug>
 #include <QString>
 #include <QFile>
 #include <QVector>
@@ -31,7 +33,8 @@ public:
   void split_container ();
   void merge_planes ();
   bool read_message_from_file (const char *);
-  void expand_to_vector ();
+  void planes_to_vector ();
+  void vector_to_planes ();
 };
 
 #endif // STEGANO_H

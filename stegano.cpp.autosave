@@ -113,10 +113,6 @@ void Stegano::planes_to_vector ()
       ++counter;
     }
   }
-  show_image("B", planes[0]);
-  show_image("G", planes[1]);
-  show_image("R", planes[2]);
-  qDebug () << "list was filled\n";
 }
 
 /* Separate vector color data in a separate planes  */
@@ -137,8 +133,4 @@ void Stegano::vector_to_planes ()
       ++counter;
     }
   }
-  show_image("reestablished B",planes[0]);
-  show_image("reestablished G",planes[1]);
-  show_image("reestablished R",planes[2]);
-
 }

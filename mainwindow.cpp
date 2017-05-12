@@ -8,7 +8,8 @@ MainWindow::MainWindow (QWidget *parent)
   container.set_data ("lenna.bmp");
   container.split_container();
   container.merge_planes();
-  container.expand_to_vector();
+  container.planes_to_vector();
+  container.vector_to_planes();
 
   /* Read message from text file */
   container.read_message_from_file("message.txt");
@@ -20,8 +21,3 @@ MainWindow::~MainWindow ()
   delete ui;
 }
 
-void MainWindow::on_messageArea_textChanged ()
-{
-  QString edit_data = ui->messageArea->toPlainText ();
- // container.set_message (edit_data);
-}
