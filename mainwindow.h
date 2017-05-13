@@ -17,6 +17,9 @@ public:
 
 private:
     Stegano container;
+    QByteArray input_message;
+    QByteArray result_message;
+
     Ui::MainWindow *ui;
 };
 

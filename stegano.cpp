@@ -5,8 +5,6 @@ using namespace cv;
 Stegano::Stegano ()
 {
   planes = new Mat[3];
-  start_stamp = "n@ch@L0";
-  end_stamp = "k0nEz$";
 }
 /* Constructot with container setting  */
 Stegano::Stegano (const char *image_path)
@@ -44,12 +42,43 @@ bool Stegano::set_container (const char *image_path)
   /* Separate image on three color planes: B, G and R respectively */
   split_container (original_container);
 
-  /* Expand color data to vector */
+  /* Expand pixel data from planes to data vector */
   planes_to_vector (planes);
 
   show_image ("Original image", original_container);
 
   return true;
+}
+
+/*
+ * Read message from input file in ASII.
+ * @file_path - path to the input file.
+ * @start_stamp - preceding symbols, points to the start of message data
+ * @end_stamp - terminal symbols, points to the end of message data
+*/
+QByteArray Stegano::read_message_from_file (const char *file_path,
+                                            const char *start_stamp,
+                                            const char *end_stamp)
+{
+  QByteArray msg_buffer;
+  QFile input_file (file_path);
+  bool ret;
+
+  /* Read text data to the buffer*/
+  ret = input_file.open (QIODevice::ReadOnly);
+  if (ret != false) {
+    msg_buffer = input_file.readAll ();
+    input_file.close ();
+  } else {
+    qDebug () << "error of opening text file\n";
+    return NULL;
+  }
+
+  /* Wrap message with start and end stamps */
+  msg_buffer.prepend (start_stamp);
+  msg_buffer.append (end_stamp);
+
+  return msg_buffer;
 }
 
 /*
@@ -66,6 +95,12 @@ void Stegano::show_image (const char *win_name, Mat image)
 /* Split container in separate planes  */
 void Stegano::split_container (Mat input_image)
 {
+  /* Check that buffer planes are empty */
+  if ((planes[0].size || planes[1].size || planes[2].size) != 0) {
+    planes[0].release ();
+    planes[1].release ();
+    planes[2].release ();
+  }
   split (input_image, planes);
 }
 
@@ -78,30 +113,6 @@ void Stegano::merge_planes (Mat result_image)
   planes[2].release ();
 }
 
-/*
- * Read message from input file in ASII.
- * @file_name - path to the input file.
-*/
-bool Stegano::read_message_from_file (const char *file_name)
-{
-  QFile input_file (file_name);
-  bool ret;
-  ret = input_file.open (QIODevice::ReadOnly);
-  if (ret != false) {
-    message = input_file.readAll ();
-    input_file.close ();
-  } else {
-    qDebug () << "error of opening text file\n";
-    return false;
-  }
-
-  /* Wrap message with start and end stamps */
-  message.append (end_stamp);
-  message.prepend (start_stamp);
-
-  return true;
-}
-
 /* Create vector, containing data from all color planes  */
 void Stegano::planes_to_vector (Mat *input_planes)
 {
@@ -110,6 +121,10 @@ void Stegano::planes_to_vector (Mat *input_planes)
   int height = plane_size.height;
   int counter = 0;
   int num_elements = height * width;
+
+  /* Check that data vector is empty */
+  if (container_data.size () != 0)
+    container_data.remove (0, container_data.size ());
 
   /* Copy planes to the vector */
   container_data.resize (num_elements * 3);
@@ -144,12 +159,25 @@ void Stegano::vector_to_planes (Mat *output_planes)
       ++counter;
     }
   }
-  /* Frees vector */
+  /* Free vector data */
   container_data.remove (0, container_data.size ());
 }
 
+/* Insert message in the container and show result  */
+void Stegano::hide_message (QByteArray message)
+{
+  /* Insert message in the data vector */
+  set_lsb_data (message);
+  /* Split vector on the color planes */
+  vector_to_planes (planes);
+  /* Merge planes in result image */
+  merge_planes (result_container);
+  /* Show output image */
+  show_image ("Result image", result_container);
+}
+
 /* Insert message in the container  */
-bool Stegano::set_lsb_data ()
+bool Stegano::set_lsb_data (QByteArray message)
 {
   char current_bit;
   char msg_byte;
@@ -183,37 +211,24 @@ bool Stegano::set_lsb_data ()
   return true;
 }
 
-/* Insert message in the container and show result  */
-void Stegano::hide_message ()
-{
-  /* Insert message in the data vector */
-  set_lsb_data ();
-  /* Split vector on the color planes */
-  vector_to_planes (planes);
-  /* Merge planes in result image */
-  merge_planes (result_container);
-  /* Show output image */
-  show_image ("Result image", result_container);
-}
-
 /* Extract message from container and save it in the file  */
-void Stegano::extract_message ()
+void Stegano::extract_message (QByteArray *extracted_msg,
+                               const char *start_stamp, const char *end_stamp)
 {
   /* Split container on the color planes */
   split_container (result_container);
   /* Expand plains to the vector */
   planes_to_vector (planes);
   /* Extract all lsb's from container */
-  extracted_message = get_lsb_data ();
+  get_lsb_data (extracted_msg);
   /* Extract message from lsb data */
-  unwrap_message (extracted_message);
+  unwrap_message (extracted_msg, start_stamp, end_stamp);
 }
-QByteArray Stegano::get_lsb_data ()
+void Stegano::get_lsb_data (QByteArray *extracted_msg)
 {
   char current_lsb;
   char msg_byte;
   int container_size = container_data.size ();
-  QByteArray buf;
   /* Get message bytes from least significant bits of the container data */
   for (int i = 0; i < container_size / 8; i++) {
     msg_byte = 0;
@@ -229,20 +244,21 @@ QByteArray Stegano::get_lsb_data ()
         msg_byte &= ~(1);
       // print_bit_view ("new:", msg_byte);
     }
-    buf.append (msg_byte);
+    extracted_msg->append (msg_byte);
   }
-  return buf;
 }
 
 /* Found message, wrapped in stamps and get it out */
-void Stegano::unwrap_message (QByteArray lsb_data)
+void Stegano::unwrap_message (QByteArray *lsb_data, const char *start_stamp,
+                              const char *end_stamp)
 {
   int start_index;
   int end_index;
-  start_index = lsb_data.indexOf (start_stamp);
-  lsb_data.remove (0, start_index + start_stamp.length ());
-  end_index = lsb_data.indexOf (end_stamp);
-  lsb_data.remove (end_index, lsb_data.length () - end_index);
+  int start_stamp_len = QByteArray (start_stamp).length ();
+  start_index = lsb_data->indexOf (start_stamp);
+  lsb_data->remove (0, start_index + start_stamp_len);
+  end_index = lsb_data->indexOf (end_stamp);
+  lsb_data->remove (end_index, lsb_data->length () - end_index);
 }
 
 void Stegano::print_bit_view (const char *prepending_text, char symbol)

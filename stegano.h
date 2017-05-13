@@ -16,31 +16,30 @@ using namespace std;
 class Stegano
 {
 private:
+  /* Elements */
   Mat original_container;
   Mat result_container;
   Mat *planes;
-  QByteArray message;
-  QByteArray extracted_message;
-  QByteArray start_stamp;
-  QByteArray end_stamp;
   QVector<char> container_data;
+
+  /* Methods */
+  void split_container (Mat);
+  void merge_planes (Mat);
+  void planes_to_vector (Mat *);
+  void vector_to_planes (Mat *);
+  bool set_lsb_data (QByteArray);
+  void get_lsb_data (QByteArray *);
+  void unwrap_message (QByteArray *, const char *, const char *);
 
 public:
   Stegano ();
   Stegano (const char *);
   ~Stegano ();
   bool set_container (const char *);
+  QByteArray read_message_from_file (const char *, const char *, const char *);
   void show_image (const char *, Mat);
-  void split_container (Mat);
-  void merge_planes (Mat);
-  bool read_message_from_file (const char *);
-  void planes_to_vector (Mat *);
-  void vector_to_planes (Mat *);
-  bool set_lsb_data ();
-  void hide_message ();
-  void extract_message ();
-  QByteArray get_lsb_data ();
-  void unwrap_message (QByteArray);
+  void hide_message (QByteArray);
+  void extract_message (QByteArray *, const char *, const char *);
   void print_bit_view (const char *, char);
 };
 
