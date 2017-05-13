@@ -10,7 +10,7 @@ Stegano::Stegano ()
 Stegano::Stegano (const char *image_path)
 {
   /* Load image */
-  set_container (image_path);
+  set_original_container (image_path);
 
   planes = new Mat[3];
 }
@@ -25,11 +25,15 @@ Stegano::~Stegano ()
  * Set container data.
  * @image_path - path to the image.
 */
-bool Stegano::set_container (const char *image_path)
+bool Stegano::set_original_container (const char *image_path)
 {
   Size container_dimensions;
 
+  /* Read image */
+  if (original_container.empty () == false)
+    original_container.release ();
   original_container = imread (image_path, IMREAD_COLOR);
+
   if (!original_container.data) {
     qDebug () << "unknow path or file";
     return false;
@@ -48,6 +52,30 @@ bool Stegano::set_container (const char *image_path)
   show_image ("Original image", original_container);
 
   return true;
+}
+
+bool Stegano::set_result_container (const char *image_path)
+{
+  /* Read image */
+  if (result_container.empty () == false)
+    result_container.release ();
+  result_container = imread (image_path, IMREAD_COLOR);
+
+  if (!result_container.data) {
+    qDebug () << "Error of opening container-result";
+    return false;
+  }
+
+  show_image("Image with message", result_container);
+  return true;
+}
+
+/* Check that container for message has been created  */
+bool Stegano::needs_container ()
+{
+  if (result_container.empty ())
+    return true;
+  return false;
 }
 
 /*
@@ -118,7 +146,8 @@ void Stegano::show_image (const char *win_name, Mat image)
 void Stegano::split_container (Mat input_image)
 {
   /* Check that buffer planes are empty */
-  if ((planes[0].size || planes[1].size || planes[2].size) != 0) {
+  if ((planes[0].empty () == true || planes[1].empty () == true ||
+       planes[2].empty () == true)) {
     planes[0].release ();
     planes[1].release ();
     planes[2].release ();
@@ -195,7 +224,7 @@ void Stegano::hide_message (QByteArray message)
   /* Merge planes in result image */
   merge_planes (result_container);
   /* Show output image */
-  show_image ("Result image", result_container);
+  show_image ("This image contains your message", result_container);
 }
 
 /* Insert message in the container  */

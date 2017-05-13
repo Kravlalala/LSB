@@ -4,6 +4,8 @@
 #include "stegano.h"
 #include <QCloseEvent>
 #include <QMainWindow>
+#include <QFileDialog>
+#include <QMessageBox>
 namespace Ui
 {
 class MainWindow;
@@ -17,6 +19,13 @@ public:
   explicit MainWindow (QWidget *parent = 0);
   void closeEvent (QCloseEvent *event);
   ~MainWindow ();
+
+private slots:
+  void on_loadContainer_clicked();
+
+  void on_insertMessage_clicked();
+
+  void on_extractMessage_clicked();
 
 private:
   Stegano container;

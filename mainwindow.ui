@@ -6,35 +6,108 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
-    <height>426</height>
+    <width>483</width>
+    <height>404</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Image stenography</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>10</y>
-      <width>121</width>
+      <x>60</x>
+      <y>20</y>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>Hidden Message</string>
+     <string>Type your text here</string>
     </property>
    </widget>
-   <widget class="QListView" name="listView">
+   <widget class="QTextEdit" name="textEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
-      <width>471</width>
-      <height>271</height>
+      <y>50</y>
+      <width>301</width>
+      <height>291</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loadContainer">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>70</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load image</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="insertMessage">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>140</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Insert message</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="fileRadio">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>190</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>From text file</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="editorRadio">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>220</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>From editor</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="extractMessage">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>260</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Extract message</string>
     </property>
    </widget>
   </widget>
@@ -43,7 +116,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>488</width>
+     <width>483</width>
      <height>22</height>
     </rect>
    </property>
@@ -57,6 +130,16 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionFor_transfer">
+   <property name="text">
+    <string>With message</string>
+   </property>
+  </action>
+  <action name="actionEmpty_container">
+   <property name="text">
+    <string>Empty container</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
