@@ -49,10 +49,10 @@ void MainWindow::on_insertMessage_clicked ()
       if (!file_path.isEmpty ()) {
         /* Read message from the text file */
         input_message = container.read_message_from_file (
-            file_path.toLatin1 ().data (), "n@ch@L0", "k0nEz$");
+            file_path.toLatin1 ().data ());
 
         /* Insert message in the container */
-        container.hide_message (input_message);
+        container.hide_message (input_message,"n@ch@L0", "k0nEz$");
       }
     } else {
       /* Get message from text editor */
@@ -60,8 +60,7 @@ void MainWindow::on_insertMessage_clicked ()
 
       /* Insert message in the container */
       if (!input_message.isEmpty ()) {
-        container.wrap_message (&input_message, "n@ch@L0", "k0nEz$");
-        container.hide_message (input_message);
+        container.hide_message (input_message,"n@ch@L0", "k0nEz$");
       } else {
         msb.setText ("Print something in the text editor, before inserting");
         msb.setWindowTitle ("Editor field is empty");

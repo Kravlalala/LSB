@@ -40,12 +40,14 @@ public:
   int set_original_container (const char *);
   bool set_result_container (const char *);
   bool needs_container ();
-  QByteArray read_message_from_file (const char *, const char *, const char *);
+  QByteArray read_message_from_file (const char *);
   void wrap_message (QByteArray *, const char *, const char *);
   bool save_message (QByteArray, const char *);
   void show_image (const char *, Mat);
-  void hide_message (QByteArray);
+  void hide_message (QByteArray, const char *, const char *);
   void extract_message (QByteArray *, const char *, const char *);
+  void random_interval_hide(QByteArray);
+  void set_interval_data(QByteArray);
   void print_bit_view (const char *, char);
 };
 

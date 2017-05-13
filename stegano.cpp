@@ -81,12 +81,8 @@ bool Stegano::needs_container ()
 /*
  * Read message from input file in ASII.
  * @file_path - path to the input file.
- * @start_stamp - preceding symbols, points to the start of message data
- * @end_stamp - terminal symbols, points to the end of message data
 */
-QByteArray Stegano::read_message_from_file (const char *file_path,
-                                            const char *start_stamp,
-                                            const char *end_stamp)
+QByteArray Stegano::read_message_from_file (const char *file_path)
 {
   QByteArray msg_buffer;
   QFile input_file (file_path);
@@ -101,9 +97,6 @@ QByteArray Stegano::read_message_from_file (const char *file_path,
     qDebug () << "error of opening text file\n";
     return NULL;
   }
-
-  /* Wrap message with start and end stamps */
-  wrap_message (&msg_buffer, start_stamp, end_stamp);
 
   return msg_buffer;
 }
@@ -221,12 +214,15 @@ void Stegano::vector_to_planes (Mat *output_planes)
 }
 
 /* Insert message in the container and show result  */
-void Stegano::hide_message (QByteArray message)
+void Stegano::hide_message (QByteArray message, const char *start_stamp,
+                            const char *end_stamp)
 {
+  /* Wrap message with start and end stamps */
+  wrap_message (&message, start_stamp, end_stamp);
   /* Insert message in the data vector */
   set_lsb_data (message);
   /* Change unused lsb's value with uniform distribution */
-  blur_insertion_bound(message);
+  blur_insertion_bound (message);
   /* Split vector on the color planes */
   vector_to_planes (planes);
   /* Merge planes in result image */
@@ -282,13 +278,13 @@ void Stegano::blur_insertion_bound (QByteArray message)
   if (msg_len < container_size) {
     for (int i = msg_len * 8; i < container_size; i++) {
       new_value = (qrand () % 256) & 1;
-     // print_bit_view("new:", new_value);
-     // print_bit_view("dat:", container_data[i]);
+      // print_bit_view("new:", new_value);
+      // print_bit_view("dat:", container_data[i]);
       if (new_value == 1)
         container_data[i] |= 1;
       else
         container_data[i] &= ~1;
-     // print_bit_view("dat:",container_data[i]);
+      // print_bit_view("dat:",container_data[i]);
     }
   }
 }
@@ -343,6 +339,17 @@ void Stegano::unwrap_message (QByteArray *lsb_data, const char *start_stamp,
   lsb_data->remove (0, start_index + start_stamp_len);
   end_index = lsb_data->indexOf (end_stamp);
   lsb_data->remove (end_index, lsb_data->length () - end_index);
+}
+
+/* Hide message via pseudo random interval method  */
+void Stegano::random_interval_hide (QByteArray message)
+{
+  /* Set bits with intervals, depending on number of 1 in previous byte
+   * position  */
+}
+
+void Stegano::set_interval_data (QByteArray message)
+{
 }
 
 /* Print char value in binary format  */
