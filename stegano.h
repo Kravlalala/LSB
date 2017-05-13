@@ -37,6 +37,7 @@ public:
   ~Stegano ();
   bool set_container (const char *);
   QByteArray read_message_from_file (const char *, const char *, const char *);
+  bool save_message (QByteArray, const char *);
   void show_image (const char *, Mat);
   void hide_message (QByteArray);
   void extract_message (QByteArray *, const char *, const char *);

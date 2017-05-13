@@ -82,6 +82,28 @@ QByteArray Stegano::read_message_from_file (const char *file_path,
 }
 
 /*
+ * Save message into the file.
+ * @message - array of message bytes.
+ * @file_path - path to the file.
+*/
+bool Stegano::save_message (QByteArray message, const char *file_path)
+{
+  QFile output_file (file_path);
+  bool ret;
+
+  ret = output_file.open (QIODevice::WriteOnly | QIODevice::Text |
+                          QIODevice::Truncate);
+  if (ret != false) {
+    output_file.write (message);
+    output_file.close ();
+    return true;
+  } else {
+    qDebug () << "Error of opening output file\n";
+    return false;
+  }
+}
+
+/*
  * Show image in a separate window.
  * @win_name - window title.
  * @image - showing image.
