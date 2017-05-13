@@ -25,7 +25,7 @@ Stegano::~Stegano ()
  * Set container data.
  * @image_path - path to the image.
 */
-bool Stegano::set_original_container (const char *image_path)
+int Stegano::set_original_container (const char *image_path)
 {
   Size container_dimensions;
 
@@ -36,7 +36,7 @@ bool Stegano::set_original_container (const char *image_path)
 
   if (!original_container.data) {
     qDebug () << "unknow path or file";
-    return false;
+    return 0;
   } else {
     container_dimensions = original_container.size ();
     result_container.create (container_dimensions.height,
@@ -51,7 +51,7 @@ bool Stegano::set_original_container (const char *image_path)
 
   show_image ("Original image", original_container);
 
-  return true;
+  return container_dimensions.width * container_dimensions.height * 3;
 }
 
 bool Stegano::set_result_container (const char *image_path)
@@ -66,7 +66,7 @@ bool Stegano::set_result_container (const char *image_path)
     return false;
   }
 
-  show_image("Image with message", result_container);
+  show_image ("Image with message", result_container);
   return true;
 }
 
@@ -103,10 +103,16 @@ QByteArray Stegano::read_message_from_file (const char *file_path,
   }
 
   /* Wrap message with start and end stamps */
-  msg_buffer.prepend (start_stamp);
-  msg_buffer.append (end_stamp);
+  wrap_message (&msg_buffer, start_stamp, end_stamp);
 
   return msg_buffer;
+}
+
+void Stegano::wrap_message (QByteArray *message, const char *start_stamp,
+                            const char *end_stamp)
+{
+  message->prepend (start_stamp);
+  message->append (end_stamp);
 }
 
 /*

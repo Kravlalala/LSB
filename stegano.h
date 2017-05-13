@@ -35,10 +35,11 @@ public:
   Stegano ();
   Stegano (const char *);
   ~Stegano ();
-  bool set_original_container (const char *);
+  int set_original_container (const char *);
   bool set_result_container (const char *);
   bool needs_container ();
   QByteArray read_message_from_file (const char *, const char *, const char *);
+  void wrap_message (QByteArray *, const char *, const char *);
   bool save_message (QByteArray, const char *);
   void show_image (const char *, Mat);
   void hide_message (QByteArray);
