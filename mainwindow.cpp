@@ -5,7 +5,7 @@
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent), ui (new Ui::MainWindow)
 {
-  container.set_data ("lenna.bmp");
+  container.set_container ("lenna.bmp");
 
   /* Read message from text file */
   container.read_message_from_file("message.txt");

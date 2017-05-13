@@ -250,3 +250,5 @@ void Stegano::print_bit_view (const char *prepending_text, char symbol)
   bitset<8> bview (symbol);
   cout << prepending_text << bview << endl;
 }
+
+

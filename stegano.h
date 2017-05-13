@@ -5,8 +5,8 @@
 #include "opencv2/highgui/highgui.hpp"
 
 #include <QDebug>
-#include <QString>
 #include <QFile>
+#include <QString>
 #include <QVector>
 #include <bitset>
 #include <iostream>
@@ -25,24 +25,22 @@ private:
   QByteArray end_stamp;
   QVector<char> container_data;
 
-  //QString message;
-
 public:
   Stegano ();
-  Stegano (const char*);
+  Stegano (const char *);
   ~Stegano ();
-  //void set_message(QString);
-  bool set_data(const char *);
+  bool set_container (const char *);
   void show_image (const char *, Mat);
   void split_container (Mat);
   void merge_planes (Mat);
   bool read_message_from_file (const char *);
   void planes_to_vector (Mat *);
   void vector_to_planes (Mat *);
-  bool ins_message ();
+  bool set_lsb_data ();
   void hide_message ();
   void extract_message ();
   QByteArray get_lsb_data ();
+  void unwrap_message (QByteArray);
   void print_bit_view (const char *, char);
 };
 
