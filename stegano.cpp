@@ -225,6 +225,8 @@ void Stegano::hide_message (QByteArray message)
 {
   /* Insert message in the data vector */
   set_lsb_data (message);
+  /* Change unused lsb's value with uniform distribution */
+  blur_insertion_bound(message);
   /* Split vector on the color planes */
   vector_to_planes (planes);
   /* Merge planes in result image */
@@ -268,6 +270,29 @@ bool Stegano::set_lsb_data (QByteArray message)
   return true;
 }
 
+void Stegano::blur_insertion_bound (QByteArray message)
+{
+  int msg_len = message.length ();
+  int container_size = container_data.size ();
+  char new_value;
+
+  /* Generate random numbers from pix intensity values */
+  srand (time (NULL));
+
+  if (msg_len < container_size) {
+    for (int i = msg_len * 8; i < container_size; i++) {
+      new_value = (qrand () % 256) & 1;
+     // print_bit_view("new:", new_value);
+     // print_bit_view("dat:", container_data[i]);
+      if (new_value == 1)
+        container_data[i] |= 1;
+      else
+        container_data[i] &= ~1;
+     // print_bit_view("dat:",container_data[i]);
+    }
+  }
+}
+
 /* Extract message from container and save it in the file  */
 void Stegano::extract_message (QByteArray *extracted_msg,
                                const char *start_stamp, const char *end_stamp)
@@ -281,6 +306,8 @@ void Stegano::extract_message (QByteArray *extracted_msg,
   /* Extract message from lsb data */
   unwrap_message (extracted_msg, start_stamp, end_stamp);
 }
+
+/* Get all lsb's from container  */
 void Stegano::get_lsb_data (QByteArray *extracted_msg)
 {
   char current_lsb;
@@ -305,7 +332,7 @@ void Stegano::get_lsb_data (QByteArray *extracted_msg)
   }
 }
 
-/* Found message, wrapped in stamps and get it out */
+/* Found message, wrapped in stamps and get it out  */
 void Stegano::unwrap_message (QByteArray *lsb_data, const char *start_stamp,
                               const char *end_stamp)
 {
@@ -318,6 +345,7 @@ void Stegano::unwrap_message (QByteArray *lsb_data, const char *start_stamp,
   lsb_data->remove (end_index, lsb_data->length () - end_index);
 }
 
+/* Print char value in binary format  */
 void Stegano::print_bit_view (const char *prepending_text, char symbol)
 {
   bitset<8> bview (symbol);

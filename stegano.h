@@ -10,6 +10,7 @@
 #include <QVector>
 #include <bitset>
 #include <iostream>
+#include <ctime>
 
 using namespace cv;
 using namespace std;
@@ -29,6 +30,7 @@ private:
   void vector_to_planes (Mat *);
   bool set_lsb_data (QByteArray);
   void get_lsb_data (QByteArray *);
+  void blur_insertion_bound (QByteArray);
   void unwrap_message (QByteArray *, const char *, const char *);
 
 public:
