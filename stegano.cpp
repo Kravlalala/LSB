@@ -51,7 +51,7 @@ int Stegano::set_original_container (const char *image_path)
 
   show_image ("Original image", original_container);
 
-  return container_dimensions.width * container_dimensions.height * 3;
+  return container_dimensions.width * container_dimensions.height * 3 / 8;
 }
 
 bool Stegano::set_result_container (const char *image_path)

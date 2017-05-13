@@ -31,7 +31,6 @@ private:
   Stegano container;
   QByteArray input_message;
   QByteArray result_message;
-  int max_message_length;
   Ui::MainWindow *ui;
 };
 

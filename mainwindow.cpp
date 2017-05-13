@@ -20,10 +20,15 @@ MainWindow::~MainWindow ()
 
 void MainWindow::on_loadContainer_clicked ()
 {
+  int max_message_length;
 
   QString image_path = QFileDialog::getOpenFileName (
       this, tr ("Open File"), "./", tr ("BMP image (*.bmp)"));
-  max_message_length = container.set_original_container (image_path.toLatin1 ().data ());
+  max_message_length =
+      container.set_original_container (image_path.toLatin1 ().data ());
+  QString lable_str =
+      QString ("Max length: %1 symbols").arg (max_message_length);
+  ui->msgLen->setText (lable_str);
 }
 
 void MainWindow::on_insertMessage_clicked ()
