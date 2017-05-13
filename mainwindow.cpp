@@ -40,12 +40,14 @@ void MainWindow::on_insertMessage_clicked ()
     if (radio_state == true) {
       file_path = QFileDialog::getOpenFileName (this, tr ("Open File"), "./",
                                                 tr ("Text (*.txt)"));
-      /* Read message from the text file */
-      input_message = container.read_message_from_file (
-          file_path.toLatin1 ().data (), "n@ch@L0", "k0nEz$");
+      if (!file_path.isEmpty ()) {
+        /* Read message from the text file */
+        input_message = container.read_message_from_file (
+            file_path.toLatin1 ().data (), "n@ch@L0", "k0nEz$");
 
-      /* Insert message in the container */
-      container.hide_message (input_message);
+        /* Insert message in the container */
+        container.hide_message (input_message);
+      }
     }
   } else {
     msb.setText ("Firstly you should to load an image");
@@ -58,13 +60,18 @@ void MainWindow::on_extractMessage_clicked ()
 {
   QString file_path = QFileDialog::getOpenFileName (
       this, tr ("Open File"), "./", tr ("BMP image (*.bmp)"));
+  if (!file_path.isEmpty ()) {
 
-  /* Set result container */
-  container.set_result_container (file_path.toLatin1 ().data ());
+    /* Set result container */
+    container.set_result_container (file_path.toLatin1 ().data ());
 
-  /* Extract message from the container */
-  container.extract_message (&result_message, "n@ch@L0", "k0nEz$");
+    /* Extract message from the container */
+    container.extract_message (&result_message, "n@ch@L0", "k0nEz$");
 
-  /* Save message into the file */
-  container.save_message (result_message, "./new_gui_message.txt");
+    QString fileName =
+        QFileDialog::getSaveFileName (this, tr ("Extracted message location"),
+                                      "./", tr ("Text files (*.txt)"));
+    /* Save message into the file */
+    container.save_message (result_message, fileName.toLatin1 ().data ());
+  }
 }
