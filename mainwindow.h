@@ -3,8 +3,8 @@
 
 #include "stegano.h"
 #include <QCloseEvent>
-#include <QMainWindow>
 #include <QFileDialog>
+#include <QMainWindow>
 #include <QMessageBox>
 namespace Ui
 {
@@ -21,11 +21,11 @@ public:
   ~MainWindow ();
 
 private slots:
-  void on_loadContainer_clicked();
+  void on_loadContainer_clicked ();
 
-  void on_insertMessage_clicked();
+  void on_insertMessage_clicked ();
 
-  void on_extractMessage_clicked();
+  void on_extractMessage_clicked ();
 
 private:
   Stegano container;

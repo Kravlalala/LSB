@@ -48,11 +48,12 @@ void MainWindow::on_insertMessage_clicked ()
                                                 tr ("Text (*.txt)"));
       if (!file_path.isEmpty ()) {
         /* Read message from the text file */
-        input_message = container.read_message_from_file (
-            file_path.toLatin1 ().data ());
+        input_message =
+            container.read_message_from_file (file_path.toLatin1 ().data ());
 
         /* Insert message in the container */
-        container.hide_message (input_message,"n@ch@L0", "k0nEz$");
+        // container.hide_message (input_message,"n@ch@L0", "k0nEz$");
+        container.random_interval_hide (input_message, 152, "k0nEz$", 9);
       }
     } else {
       /* Get message from text editor */
@@ -60,7 +61,8 @@ void MainWindow::on_insertMessage_clicked ()
 
       /* Insert message in the container */
       if (!input_message.isEmpty ()) {
-        container.hide_message (input_message,"n@ch@L0", "k0nEz$");
+        //container.hide_message (input_message, "n@ch@L0", "k0nEz$");
+        container.random_interval_hide (input_message, 152, "k0nEz$", 9);
       } else {
         msb.setText ("Print something in the text editor, before inserting");
         msb.setWindowTitle ("Editor field is empty");
@@ -85,8 +87,8 @@ void MainWindow::on_extractMessage_clicked ()
     container.set_result_container (file_path.toLatin1 ().data ());
 
     /* Extract message from the container */
-    container.extract_message (&result_message, "n@ch@L0", "k0nEz$");
-
+    // container.extract_message (&result_message, "n@ch@L0", "k0nEz$");
+    container.random_interval_extract (&result_message, 152, "k0nEz$", 9);
     QString fileName =
         QFileDialog::getSaveFileName (this, tr ("Extracted message location"),
                                       "./", tr ("Text files (*.txt)"));

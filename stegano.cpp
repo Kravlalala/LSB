@@ -295,7 +295,7 @@ void Stegano::extract_message (QByteArray *extracted_msg,
 {
   /* Split container on the color planes */
   split_container (result_container);
-  /* Expand plains to the vector */
+  /* Expand planes to the vector */
   planes_to_vector (planes);
   /* Extract all lsb's from container */
   get_lsb_data (extracted_msg);
@@ -342,14 +342,110 @@ void Stegano::unwrap_message (QByteArray *lsb_data, const char *start_stamp,
 }
 
 /* Hide message via pseudo random interval method  */
-void Stegano::random_interval_hide (QByteArray message)
+void Stegano::random_interval_hide (QByteArray message, int start_stamp,
+                                    const char *stop_stamp, int key)
 {
+  message.append (stop_stamp);
   /* Set bits with intervals, depending on number of 1 in previous byte
    * position  */
+  set_interval_data (message, start_stamp, key);
+  /* Split vector on the color planes */
+  vector_to_planes (planes);
+  /* Merge planes in result image */
+  merge_planes (result_container);
+  /* Show output image */
+  show_image ("This image contains your message", result_container);
 }
 
-void Stegano::set_interval_data (QByteArray message)
+/* Set data into the lsb through pseudo random intervals between message bits */
+void Stegano::set_interval_data (QByteArray message, int start_stamp, int key)
 {
+  int msg_len = message.length ();
+  int ins_pos = start_stamp;
+  int interval;
+  char current_bit;
+  char msg_byte;
+
+  if (msg_len < (container_data.size () - start_stamp) / (key * 8)) {
+    for (int i = 0; i < msg_len; i++) {
+      msg_byte = message.at (i);
+      // print_bit_view ("msg:", msg_byte);
+      for (int j = 0; j < 8; j++) {
+        interval = count_ones_number (ins_pos) * key;
+        ins_pos += interval;
+        // qDebug () << ins_pos << endl;
+        current_bit = msg_byte & 0x80;
+        // print_bit_view ("lsb:", current_bit);
+        // print_bit_view ("dat:", container_data[ins_pos]);
+        if (current_bit != 0)
+          container_data[ins_pos] |= 1;
+        else
+          container_data[ins_pos] &= ~1;
+        // print_bit_view ("dat:", container_data[ins_pos]);
+        msg_byte <<= 1;
+        // print_bit_view ("msg:", msg_byte);
+      }
+    }
+  } else
+    cout << "too big message" << endl;
+}
+
+/* Extract data from lsb's setted by pseudo random interval method  */
+void Stegano::random_interval_extract (QByteArray *extracred_message,
+                                       int start_stamp, const char *end_stamp,
+                                       int key)
+{
+  /* Split container on the color planes */
+  split_container (result_container);
+  /* Expand planes to the vector */
+  planes_to_vector (planes);
+  /* Get message bytes from interval lsb's */
+  get_interval_data (extracred_message, 152, 9);
+  /* Delete end stamp and rubbush follows after it from message */
+  unwrap_message (extracred_message, NULL, end_stamp);
+}
+
+void Stegano::get_interval_data (QByteArray *extracted_message, int start_stamp,
+                                 int key)
+{
+  int container_len = container_data.length ();
+  int ins_pos = start_stamp;
+  int interval;
+  char current_bit;
+  char msg_byte = 0;
+
+  for (int i = 0; i < container_len; i++) {
+    for (int j = 0; j < 8; j++) {
+      msg_byte <<= 1;
+      // print_bit_view ("msg:", msg_byte);
+      interval = count_ones_number (ins_pos) * key;
+      ins_pos += interval;
+      if (ins_pos > container_len) {
+        i = container_len;
+        break;
+      }
+      // qDebug () << ins_pos << endl;
+      current_bit = container_data[ins_pos] & 1;
+      // print_bit_view ("cur:", current_bit);
+      if (current_bit == 1) {
+        msg_byte |= current_bit;
+      } else {
+        msg_byte &= ~current_bit;
+      }
+      // print_bit_view ("msg:", msg_byte);
+    }
+    extracted_message->append (msg_byte);
+  }
+}
+
+/* Count number of bits, setted to 1  */
+int Stegano::count_ones_number (int number)
+{
+  int counter;
+  for (counter = 0; number; number >>= 1) {
+    counter += number & 1;
+  }
+  return counter;
 }
 
 /* Print char value in binary format  */

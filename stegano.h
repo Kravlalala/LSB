@@ -9,8 +9,8 @@
 #include <QString>
 #include <QVector>
 #include <bitset>
-#include <iostream>
 #include <ctime>
+#include <iostream>
 
 using namespace cv;
 using namespace std;
@@ -31,7 +31,10 @@ private:
   bool set_lsb_data (QByteArray);
   void get_lsb_data (QByteArray *);
   void blur_insertion_bound (QByteArray);
+  void set_interval_data (QByteArray, int, int);
+  void get_interval_data (QByteArray*, int, int);
   void unwrap_message (QByteArray *, const char *, const char *);
+  int count_ones_number (int);
 
 public:
   Stegano ();
@@ -46,8 +49,8 @@ public:
   void show_image (const char *, Mat);
   void hide_message (QByteArray, const char *, const char *);
   void extract_message (QByteArray *, const char *, const char *);
-  void random_interval_hide(QByteArray);
-  void set_interval_data(QByteArray);
+  void random_interval_hide (QByteArray, int, const char *, int);
+  void random_interval_extract (QByteArray *, int, const char *, int);
   void print_bit_view (const char *, char);
 };
 
